@@ -1,11 +1,14 @@
 package site.shawnxxy.umby.utilities;
 
+import android.net.Uri;
 import android.print.PrinterId;
+import android.util.Log;
 
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -31,7 +34,23 @@ public final class NetworkUtils {
 
     // Query weather by location
     public static URL buildUrl(String  localtionQuery) {
-        return null;
+        Uri buildUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                .appendQueryParameter(QUERY_PARAM, localtionQuery)
+                .appendQueryParameter(FORMAT_PARAM, format)
+                .appendQueryParameter(UNITS_PARAM, units)
+                .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(buildUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
     }
 
     // Query weather by coordinates
