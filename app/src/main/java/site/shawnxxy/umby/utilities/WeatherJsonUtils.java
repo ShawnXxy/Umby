@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 
-public class WeatherJsonUtils {
+public final class WeatherJsonUtils {
 
     public static String[] parseWeatherJson(Context c,String weatherString) throws JSONException {
         final String WEATHER_LIST = "list";
@@ -64,7 +64,7 @@ public class WeatherJsonUtils {
             JSONObject temperatureObj = dayForecast.getJSONObject(WEATHER_TEMPERATURE);
             high = temperatureObj.getDouble(WEATHER_MAX);
             low = temperatureObj.getDouble(WEATHER_MIN);
-            highLow= WeatherUtils.formatHighLows(context, high, low);
+            highLow= WeatherUtils.formatHighLow(c, high, low);
 
             parsedWeatherData[i] = date + " - " + description + " - " + highLow;
         }

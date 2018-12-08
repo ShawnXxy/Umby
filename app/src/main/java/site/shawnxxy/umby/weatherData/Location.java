@@ -2,7 +2,7 @@ package site.shawnxxy.umby.weatherData;
 
 import android.content.Context;
 
-public class localtion {
+public class Location {
 
     public static final String CITY = "city";
     public static final String LAT = "lat";

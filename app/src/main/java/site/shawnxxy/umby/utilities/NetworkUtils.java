@@ -10,7 +10,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-public class NetworkUtils {
+public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 

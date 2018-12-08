@@ -8,7 +8,7 @@ import java.util.TimeZone;
 
 import site.shawnxxy.umby.R;
 
-public class DayUtils {
+public final class DayUtils {
 
     public static final long SEC_IN_MILLIS = 1000;
     public static final long MIN_IN_MILLIS = SEC_IN_MILLIS * 60;
