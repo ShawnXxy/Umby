@@ -1,5 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Umby</string>
+
+    <string name="action_refresh">Refresh</string>
+    <!--error message shown if refresh failed-->
+    <string name="error_msg">An error occurred. Please check your Internet and try again!</string>
 
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>

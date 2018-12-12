@@ -3,6 +3,11 @@ package site.shawnxxy.umby;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.URL;
@@ -13,15 +18,19 @@ import site.shawnxxy.umby.weatherData.Location;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Field to store the weather display
+    // Field to display the weather
     private TextView weatherDataTextView;
+    // Field to display error message if any
+    private TextView errorMsg;
+    // Field to display progressbar if available
+    private ProgressBar loadingProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //get reference
+        //get reference for weather data
         weatherDataTextView = findViewById(R.id.weather_data_textview);
         //dummy data for test
 //        String[] dummyWeatherPool = {
@@ -45,17 +54,38 @@ public class MainActivity extends AppCompatActivity {
 //            weatherDataTextView.append(dummyWeatherData + "\n\n\n");
 //        }
 
+        // get reference for error message
+        errorMsg = findViewById(R.id.error_msg);
+        // ger reference for loading progress bar
+        loadingProgressBar = findViewById(R.id.loading_progressbar);
+
         loadWeatherData();
+    }
+
+    // helper function to display weather data
+    private void showWeatherData() {
+        // if there is error msg
+        errorMsg.setVisibility(View.INVISIBLE);
+        weatherDataTextView.setVisibility(View.VISIBLE);
     }
 
     // get location to load weather data
     private void loadWeatherData() {
+        showWeatherData();
+
         String location = Location.getPrefLocation(this);
         new FetchWeatherTask().execute(location);
     }
 
     // network request
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+
+        // show loading progressbar
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loadingProgressBar.setVisibility(View.VISIBLE);
+        }
 
         // request in background
         @Override
@@ -82,11 +112,40 @@ public class MainActivity extends AppCompatActivity {
         // Display result
         @Override
         protected void onPostExecute(String[] weatherData) {
+            // hide progressbar
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+
             if (weatherData != null) {
+                showWeatherData();
                 for (String weather : weatherData) {
                     weatherDataTextView.append(weather + "\n\n\n");
                 }
+            } else {
+                // hide weather data
+                weatherDataTextView.setVisibility(View.INVISIBLE);
+                // display error message
+                errorMsg.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    // inflate the menu: return true to display the menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.forecast, menu);
+        return true;
+    }
+
+    // Click refresh button
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            weatherDataTextView.setText("");
+            loadWeatherData();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
