@@ -5,17 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/weather_data_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textSize="20sp"/>
-    </ScrollView>
+    <!--<ScrollView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<TextView-->
+            <!--android:id="@+id/weather_data_textview"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="16dp"-->
+            <!--android:textSize="20sp"/>-->
+    <!--</ScrollView>-->
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/weather_data_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <!--error message-->
     <TextView
         android:id="@+id/error_msg"

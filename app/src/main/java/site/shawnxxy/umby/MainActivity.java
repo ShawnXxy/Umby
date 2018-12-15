@@ -3,6 +3,8 @@ package site.shawnxxy.umby;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +21,9 @@ import site.shawnxxy.umby.weatherData.Location;
 public class MainActivity extends AppCompatActivity {
 
     // Field to display the weather
-    private TextView weatherDataTextView;
+//    private TextView weatherDataTextView;
+    private RecyclerView weatherDataRecyclerView;
+    private WeatherAdapter weatherAdapter;
     // Field to display error message if any
     private TextView errorMsg;
     // Field to display progressbar if available
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //get reference for weather data
-        weatherDataTextView = findViewById(R.id.weather_data_textview);
+        weatherDataRecyclerView = findViewById(R.id.weather_data_recyclerview);
         //dummy data for test
 //        String[] dummyWeatherPool = {
 //                "Today, May 17 - Clear - 17°C / 15°C",
@@ -56,6 +60,18 @@ public class MainActivity extends AppCompatActivity {
 
         // get reference for error message
         errorMsg = findViewById(R.id.error_msg);
+
+        // Support vertical or horizontal orientations
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        weatherDataRecyclerView.setLayoutManager(linearLayoutManager);
+
+        //
+        weatherDataRecyclerView.setHasFixedSize(true);
+
+        // Linking weather data with the views in the end of recyclerview list
+        weatherAdapter = new WeatherAdapter();
+        weatherDataRecyclerView.setAdapter(weatherAdapter);
+
         // ger reference for loading progress bar
         loadingProgressBar = findViewById(R.id.loading_progressbar);
 
@@ -66,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private void showWeatherData() {
         // if there is error msg
         errorMsg.setVisibility(View.INVISIBLE);
-        weatherDataTextView.setVisibility(View.VISIBLE);
+        weatherDataRecyclerView.setVisibility(View.VISIBLE);
     }
 
     // get location to load weather data
@@ -117,12 +133,13 @@ public class MainActivity extends AppCompatActivity {
 
             if (weatherData != null) {
                 showWeatherData();
-                for (String weather : weatherData) {
-                    weatherDataTextView.append(weather + "\n\n\n");
-                }
+//                for (String weather : weatherData) {
+//                    weatherDataTextView.append(weather + "\n\n\n");
+//                }
+                weatherAdapter.setNewWeatherData(weatherData);
             } else {
                 // hide weather data
-                weatherDataTextView.setVisibility(View.INVISIBLE);
+                weatherDataRecyclerView.setVisibility(View.INVISIBLE);
                 // display error message
                 errorMsg.setVisibility(View.VISIBLE);
             }
@@ -142,7 +159,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            weatherDataTextView.setText("");
+//            weatherDataTextView.setText("");
+            weatherAdapter.setNewWeatherData(null);
             loadWeatherData();
             return true;
         }
