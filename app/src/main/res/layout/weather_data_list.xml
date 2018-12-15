@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/weather_data_textview"
-        android:style="@style/TextAppearance.AppCompat.Large"
+        style="@style/TextAppearance.AppCompat.Large"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:padding="16dp"/>
