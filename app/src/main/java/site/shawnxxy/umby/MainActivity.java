@@ -1,5 +1,6 @@
 package site.shawnxxy.umby;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.URL;
 
@@ -18,7 +20,7 @@ import site.shawnxxy.umby.utilities.NetworkUtils;
 import site.shawnxxy.umby.utilities.WeatherJsonUtils;
 import site.shawnxxy.umby.weatherData.Location;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler {
 
     // Field to display the weather
 //    private TextView weatherDataTextView;
@@ -69,13 +71,20 @@ public class MainActivity extends AppCompatActivity {
         weatherDataRecyclerView.setHasFixedSize(true);
 
         // Linking weather data with the views in the end of recyclerview list
-        weatherAdapter = new WeatherAdapter();
+        weatherAdapter = new WeatherAdapter(this);
         weatherDataRecyclerView.setAdapter(weatherAdapter);
 
         // ger reference for loading progress bar
         loadingProgressBar = findViewById(R.id.loading_progressbar);
 
         loadWeatherData();
+    }
+
+    // Show message when is clicked
+    @Override
+    public void onClick(String weatherForDay) {
+        Context context = this;
+        Toast.makeText(context, weatherForDay, Toast.LENGTH_SHORT).show();
     }
 
     // helper function to display weather data

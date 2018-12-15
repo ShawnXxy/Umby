@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/weather_data_textview"
-        style="@style/TextAppearance.AppCompat.Large"
+        android:style="@style/TextAppearance.AppCompat.Large"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:padding="16dp"/>
@@ -14,9 +14,9 @@
     <!--background : visually divide the weather data list-->
     <View
        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#dadada"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"/>
+       android:layout_height="1dp"
+       android:background="#dadada"
+       android:layout_marginLeft="8dp"
+       android:layout_marginRight="8dp"/>
 
 </LinearLayout>
