@@ -1,11 +1,13 @@
 package site.shawnxxy.umby;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -80,21 +82,18 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         loadWeatherData();
     }
 
-    // Show message when is clicked
-    @Override
-    public void onClick(String weatherForDay) {
-        Context context = this;
-        Toast.makeText(context, weatherForDay, Toast.LENGTH_SHORT).show();
-    }
-
-    // helper function to display weather data
+    /**
+     *     helper function to display weather data
+     */
     private void showWeatherData() {
         // if there is error msg
         errorMsg.setVisibility(View.INVISIBLE);
         weatherDataRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    // get location to load weather data
+    /**
+     *     get location to load weather data
+     */
     private void loadWeatherData() {
         showWeatherData();
 
@@ -102,7 +101,23 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         new FetchWeatherTask().execute(location);
     }
 
-    // network request
+    /**
+     *    Show message when is clicked
+     */
+    @Override
+    public void onClick(String weatherForDay) {
+        Context context = this;
+//        Toast.makeText(context, weatherForDay, Toast.LENGTH_SHORT).show();
+
+        // A new activity will start to load weather details if click on it
+        Class destination = WeatherDetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destination);
+        startActivity(intentToStartDetailActivity);
+    }
+
+    /**
+     *     network request
+     */
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         // show loading progressbar
@@ -134,7 +149,9 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
             }
         }
 
-        // Display result
+        /**
+         *         Display result
+         */
         @Override
         protected void onPostExecute(String[] weatherData) {
             // hide progressbar
@@ -155,7 +172,9 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         }
     }
 
-    // inflate the menu: return true to display the menu
+    /**
+     *   inflate the menu: return true to display the menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -163,7 +182,9 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         return true;
     }
 
-    // Click refresh button
+    /**
+     *     Click refresh button
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
