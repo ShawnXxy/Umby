@@ -30,7 +30,6 @@
                 android:value=".MainActivity"></meta-data>
         </activity>
 
-        <activity android:name=".WeatherDetailActivity"></activity>
     </application>
 
 </manifest>
