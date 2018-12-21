@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         // A new activity will start to load weather details if click on it
         Class destination = WeatherDetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destination);
+        // Pass weather data to detail activity
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
         startActivity(intentToStartDetailActivity);
     }
 
