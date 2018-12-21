@@ -6,6 +6,10 @@
     <!--error message shown if refresh failed-->
     <string name="error_msg">An error occurred. Please check your Internet and try again!</string>
 
+    <!--menu for map-->
+    <string name="action_map">Map Location</string>
+    <string name="action_share">Share</string>
+
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
 

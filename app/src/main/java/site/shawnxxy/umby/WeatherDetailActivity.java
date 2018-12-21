@@ -1,8 +1,11 @@
 package site.shawnxxy.umby;
 
 import android.content.Intent;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 public class WeatherDetailActivity extends AppCompatActivity {
@@ -28,5 +31,24 @@ public class WeatherDetailActivity extends AppCompatActivity {
                 weatherDetail.setText(forcast);
             }
         }
+    }
+
+    /**
+     *  Display menu and implement sharing
+     */
+    private Intent intentToShareForecast() {
+        Intent share = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(forcast + WEATHER_SHARE_TAG)
+                .getIntent();
+        return share;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.detail, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        menuItem.setIntent(intentToShareForecast());
+        return true;
     }
 }

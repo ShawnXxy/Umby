@@ -2,11 +2,13 @@ package site.shawnxxy.umby;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,8 @@ import site.shawnxxy.umby.utilities.WeatherJsonUtils;
 import site.shawnxxy.umby.weatherData.Location;
 
 public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     // Field to display the weather
 //    private TextView weatherDataTextView;
@@ -175,6 +179,23 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     }
 
     /**
+     *  Help function to load map
+     */
+    private void openLocationMap() {
+        String address = "1600 Ampitheatre Parkway, CA";
+        Uri geoLocation = Uri.parse("geo:0,0?q=" + address);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d(TAG, "Couldn't get " + geoLocation.toString() + ", no receiving apps installed!");
+        }
+    }
+
+    /**
      *   inflate the menu: return true to display the menu
      */
     @Override
@@ -194,6 +215,12 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
 //            weatherDataTextView.setText("");
             weatherAdapter.setNewWeatherData(null);
             loadWeatherData();
+            return true;
+        }
+
+        // open map when clicked
+        if (id == R.id.action_map) {
+            openLocationMap();
             return true;
         }
         return super.onOptionsItemSelected(item);
