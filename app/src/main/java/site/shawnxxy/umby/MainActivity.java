@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,7 +28,7 @@ import site.shawnxxy.umby.utilities.NetworkUtils;
 import site.shawnxxy.umby.utilities.WeatherJsonUtils;
 import site.shawnxxy.umby.weatherData.Location;
 
-public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler {
+public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler, LoaderManager.LoaderCallbacks<String[]> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     private TextView errorMsg;
     // Field to display progressbar if available
     private ProgressBar loadingProgressBar;
+
+    private static final int FORECAST_LOADER_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +89,78 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         // ger reference for loading progress bar
         loadingProgressBar = findViewById(R.id.loading_progressbar);
 
-        loadWeatherData();
+        // Implement AsyncTaskLoader
+        int loaderId = FORECAST_LOADER_ID;
+        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
+        Bundle bundleforLoader = null;
+        getSupportLoaderManager().initLoader(loaderId, bundleforLoader, callbacks);
+
+//        loadWeatherData();
+    }
+
+    @Override
+    public Loader<String[]> onCreateLoader(int id, final Bundle loaderArgs) {
+        return new AsyncTaskLoader<String[]>(this) {
+
+            String[] weatherData = null;
+
+            @Override
+            protected void onStartLoading() {
+                if (weatherData != null) {
+                    deliverResult(weatherData);
+                } else {
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public String[] loadInBackground() {
+                String locationQuery = Location.getPrefLocation(MainActivity.this);
+
+                URL weatherRequestUrl = NetworkUtils.buildUrl(locationQuery);
+
+                try {
+                    String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
+
+                    String[] jsonWeatherData = WeatherJsonUtils.parseWeatherJson(MainActivity.this, jsonWeatherResponse);
+
+                    return jsonWeatherData;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            public void deliverResult(String[] data) {
+                weatherData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+        loadingProgressBar.setVisibility(View.INVISIBLE);
+        weatherAdapter.setNewWeatherData(data);
+        if (null == data) {
+            weatherDataRecyclerView.setVisibility(View.INVISIBLE);
+            errorMsg.setVisibility(View.VISIBLE);
+        } else {
+            showWeatherData();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
+    }
+
+    /**
+     *  Helper function used to hide weather data when refreshing
+     */
+    private void hideWeatherData() {
+        weatherAdapter.setNewWeatherData(null);
     }
 
     /**
@@ -98,12 +175,12 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     /**
      *     get location to load weather data
      */
-    private void loadWeatherData() {
-        showWeatherData();
-
-        String location = Location.getPrefLocation(this);
-        new FetchWeatherTask().execute(location);
-    }
+//    private void loadWeatherData() {
+//        showWeatherData();
+//
+//        String location = Location.getPrefLocation(this);
+//        new FetchWeatherTask().execute(location);
+//    }
 
     /**
      *    Show message when is clicked
@@ -124,59 +201,59 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     /**
      *     network request
      */
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
-
-        // show loading progressbar
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            loadingProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        // request in background
-        @Override
-        protected String[] doInBackground(String... params) {
-            if (params.length == 0) {
-                return null;
-            }
-
-            String location = params[0];
-            URL weatherRequestUrl = NetworkUtils.buildUrl(location);
-
-            try {
-                String weatherJson = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
-
-                String[] weatherData = WeatherJsonUtils.parseWeatherJson(MainActivity.this, weatherJson);
-
-                return weatherData;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        /**
-         *         Display result
-         */
-        @Override
-        protected void onPostExecute(String[] weatherData) {
-            // hide progressbar
-            loadingProgressBar.setVisibility(View.INVISIBLE);
-
-            if (weatherData != null) {
-                showWeatherData();
-//                for (String weather : weatherData) {
-//                    weatherDataTextView.append(weather + "\n\n\n");
-//                }
-                weatherAdapter.setNewWeatherData(weatherData);
-            } else {
-                // hide weather data
-                weatherDataRecyclerView.setVisibility(View.INVISIBLE);
-                // display error message
-                errorMsg.setVisibility(View.VISIBLE);
-            }
-        }
-    }
+//    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+//
+//        // show loading progressbar
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            loadingProgressBar.setVisibility(View.VISIBLE);
+//        }
+//
+//        // request in background
+//        @Override
+//        protected String[] doInBackground(String... params) {
+//            if (params.length == 0) {
+//                return null;
+//            }
+//
+//            String location = params[0];
+//            URL weatherRequestUrl = NetworkUtils.buildUrl(location);
+//
+//            try {
+//                String weatherJson = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
+//
+//                String[] weatherData = WeatherJsonUtils.parseWeatherJson(MainActivity.this, weatherJson);
+//
+//                return weatherData;
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }
+//
+//        /**
+//         *         Display result
+//         */
+//        @Override
+//        protected void onPostExecute(String[] weatherData) {
+//            // hide progressbar
+//            loadingProgressBar.setVisibility(View.INVISIBLE);
+//
+//            if (weatherData != null) {
+//                showWeatherData();
+////                for (String weather : weatherData) {
+////                    weatherDataTextView.append(weather + "\n\n\n");
+////                }
+//                weatherAdapter.setNewWeatherData(weatherData);
+//            } else {
+//                // hide weather data
+//                weatherDataRecyclerView.setVisibility(View.INVISIBLE);
+//                // display error message
+//                errorMsg.setVisibility(View.VISIBLE);
+//            }
+//        }
+//    }
 
     /**
      *  Help function to load map
@@ -213,8 +290,10 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
 //            weatherDataTextView.setText("");
-            weatherAdapter.setNewWeatherData(null);
-            loadWeatherData();
+//            weatherAdapter.setNewWeatherData(null);
+            hideWeatherData();
+//            loadWeatherData();
+            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
             return true;
         }
 

@@ -12,7 +12,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
 
     private static final String WEATHER_SHARE_TAG = "#Umby";
 
-    private String forcast;
+    private String forecast;
     private TextView weatherDetail;
 
     @Override
@@ -27,8 +27,8 @@ public class WeatherDetailActivity extends AppCompatActivity {
         // Display weather details that was passed from MainActivity
         if (intentToStartActivity != null) {
             if (intentToStartActivity.hasExtra(Intent.EXTRA_TEXT)) {
-                forcast = intentToStartActivity.getStringExtra(Intent.EXTRA_TEXT);
-                weatherDetail.setText(forcast);
+                forecast = intentToStartActivity.getStringExtra(Intent.EXTRA_TEXT);
+                weatherDetail.setText(forecast);
             }
         }
     }
@@ -39,7 +39,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
     private Intent intentToShareForecast() {
         Intent share = ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
-                .setText(forcast + WEATHER_SHARE_TAG)
+                .setText(forecast + WEATHER_SHARE_TAG)
                 .getIntent();
         return share;
     }
