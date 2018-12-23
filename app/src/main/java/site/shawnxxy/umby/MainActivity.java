@@ -302,6 +302,14 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
             openLocationMap();
             return true;
         }
+
+        // open settings menu when clicked
+        if (id == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }

@@ -51,4 +51,21 @@ public class WeatherDetailActivity extends AppCompatActivity {
         menuItem.setIntent(intentToShareForecast());
         return true;
     }
+
+    /**
+     *
+     *  Launch Settings menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        int id = menuItem.getItemId();
+
+        if (id == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(menuItem);
+    }
 }
