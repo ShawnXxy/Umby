@@ -1,6 +1,10 @@
 package site.shawnxxy.umby.weatherData;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import site.shawnxxy.umby.R;
 
 public class Location {
 
@@ -25,15 +29,31 @@ public class Location {
 
     }
 
+    /**
+     *  return user's preferred location
+     */
     public static String getPrefLocation(Context c) {
-
-        return getDefaultLocation();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
+        String keyForLocation = c.getString(R.string.pref_location_key);
+        String defaultLocation = c.getString(R.string.pref_location_default);
+//        return getDefaultLocation();
+        return preferences.getString(keyForLocation, defaultLocation);
     }
 
     //Returns true if the user has selected metric temperature display.
     public static boolean isMetric(Context c) {
-
-        return true;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
+        String keyForUnits = c.getString(R.string.pref_units_key);
+        String defaultUnits = c.getString(R.string.pref_units_metric);
+        String prefUnits = preferences.getString(keyForUnits, defaultUnits);
+        String metric = c.getString(R.string.pref_units_metric);
+        boolean userPrefMetrics;
+        if (metric.equals(prefUnits)) {
+            userPrefMetrics = true;
+        } else {
+            userPrefMetrics =false;
+        }
+        return userPrefMetrics;
     }
 
     public static double[] getLocationCoordinates(Context c) {

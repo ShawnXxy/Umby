@@ -2,8 +2,10 @@ package site.shawnxxy.umby;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -28,7 +30,7 @@ import site.shawnxxy.umby.utilities.NetworkUtils;
 import site.shawnxxy.umby.utilities.WeatherJsonUtils;
 import site.shawnxxy.umby.weatherData.Location;
 
-public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler, LoaderManager.LoaderCallbacks<String[]> {
+public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler, LoaderManager.LoaderCallbacks<String[]>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     private ProgressBar loadingProgressBar;
 
     private static final int FORECAST_LOADER_ID = 0;
+
+    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
         Bundle bundleforLoader = null;
         getSupportLoaderManager().initLoader(loaderId, bundleforLoader, callbacks);
+
+        Log.d(TAG, "onCreate: registering preference changed listener");
+
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
 //        loadWeatherData();
     }
@@ -154,6 +162,23 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     @Override
     public void onLoaderReset(Loader<String[]> loader) {
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (PREFERENCES_HAVE_BEEN_UPDATED) {
+            Log.d(TAG, "onStart: preferences were updated");
+            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+            PREFERENCES_HAVE_BEEN_UPDATED = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -259,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
      *  Help function to load map
      */
     private void openLocationMap() {
-        String address = "1600 Ampitheatre Parkway, CA";
+        String address = Location.getPrefLocation(this);
         Uri geoLocation = Uri.parse("geo:0,0?q=" + address);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -311,5 +336,10 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        PREFERENCES_HAVE_BEEN_UPDATED = true;
     }
 }
