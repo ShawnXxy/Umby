@@ -67,8 +67,7 @@ public final class OpenWeatherMapJsonUtils {
 
 //        long localDate = System.currentTimeMillis();
 //        long utcDate = DayUtils.localTimeToUTC(localDate);
-//        long startDay = DayUtils.normalizeDate(utcDate);
-
+        long startDay = DayUtils.millisToUtcToday();
 
         for (int i = 0; i < weatherArray.length(); i++) {
             String date;
