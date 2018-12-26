@@ -13,19 +13,31 @@ public class Location {
     public static final String LON = "lon";
 
     // dummy location for test
-    private static final String DEFAULT_LOCATION = "94043, USA";
-    private static final double[] DEFAULT_COORD = {37.4284, 122.0724};
-    private static final String DEFAULT_ADDR = "1600 Amphitheatre Parkway, Mountain View, CA 94043";
+//    private static final String DEFAULT_LOCATION = "94043, USA";
+//    private static final double[] DEFAULT_COORD = {37.4284, 122.0724};
+//    private static final String DEFAULT_ADDR = "1600 Amphitheatre Parkway, Mountain View, CA 94043";
 
-    static public void setLocation(Context c, String city, double lat, double lon) {
+    static public void setLocationCoord(Context c, double lat, double lon) {
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putLong(LAT, Double.doubleToRawLongBits(lat));
+        editor.putLong(LON, Double.doubleToRawLongBits(lon));
+        editor.apply();
     }
 
-    static public void setNewLocation(Context c, String newLocation, double lat, double lon) {
+//    static public void setNewLocation(Context c, String newLocation, double lat, double lon) {
+//    }
 
-    }
+    static public void resetLocationCoord(Context c) {
 
-    static public void resetLocationCoordinates(Context c) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.remove(LAT);
+        editor.remove(LON);
+        editor.apply();
 
     }
 
@@ -56,23 +68,63 @@ public class Location {
         return userPrefMetrics;
     }
 
-    public static double[] getLocationCoordinates(Context c) {
-        return getDefaultCoordinates();
+    public static double[] getLocationCoord(Context c) {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c);
+
+        double[] prefCoord = new double[2];
+
+        prefCoord[0] = Double.longBitsToDouble(sharedPreferences.getLong(LAT, Double.doubleToRawLongBits(0.0)));
+        prefCoord[1] = Double.longBitsToDouble(sharedPreferences.getLong(LON, Double.doubleToRawLongBits(0.0)));
+
+//        return getDefaultCoordinates();
+        return prefCoord;
     }
 
     //Returns true if the latitude and longitude values are available.
     public static boolean isLocationLatLonAvailable(Context c) {
 
-        return false;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(c);
+
+        boolean containLat = sharedPreferences.contains(LAT);
+        boolean containLon = sharedPreferences.contains(LON);
+        boolean isLatLonValid = false;
+        if (containLat && containLon) {
+            isLatLonValid = true;
+        }
+
+        return isLatLonValid;
     }
 
-    private static String getDefaultLocation() {
+//    private static String getDefaultLocation() {
+//
+//        return DEFAULT_LOCATION;
+//    }
+//
+//    public static double[] getDefaultCoordinates() {
+//
+//        return DEFAULT_COORD;
+//    }
 
-        return DEFAULT_LOCATION;
+    public static long getLastNotificationTimeInMillis(Context context) {
+
+        String lastNotificationKey = context.getString(R.string.pref_last_notification);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        long lastNotificationTime = sharedPreferences.getLong(lastNotificationKey, 0);
+        return lastNotificationTime;
     }
 
-    public static double[] getDefaultCoordinates() {
+    public static long getEllapsedTimeSinceLastNotification(Context context) {
+        long lastNotificationInTimeMillis = Location.getLastNotificationTimeInMillis(context);
+        long timeSinceLastNotification = System.currentTimeMillis() - lastNotificationInTimeMillis;
+        return timeSinceLastNotification;
+    }
 
-        return DEFAULT_COORD;
+    public static void saveLastNotificationTime(Context context, long notificationTime) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String lastNotificationKey = context.getString(R.string.pref_last_notification);
+        editor.putLong(lastNotificationKey, notificationTime);
+        editor.apply();
     }
 }

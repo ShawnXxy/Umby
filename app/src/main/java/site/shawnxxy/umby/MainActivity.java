@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -15,19 +13,17 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.net.URL;
 
 import site.shawnxxy.umby.utilities.NetworkUtils;
-import site.shawnxxy.umby.utilities.WeatherJsonUtils;
+import site.shawnxxy.umby.utilities.OpenWeatherMapJsonUtils;
 import site.shawnxxy.umby.weatherData.Location;
 
 public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler, LoaderManager.LoaderCallbacks<String[]>, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -131,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
                 try {
                     String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
 
-                    String[] jsonWeatherData = WeatherJsonUtils.parseWeatherJson(MainActivity.this, jsonWeatherResponse);
+                    String[] jsonWeatherData = OpenWeatherMapJsonUtils.parseWeatherJson(MainActivity.this, jsonWeatherResponse);
 
                     return jsonWeatherData;
                 } catch (Exception e) {
@@ -248,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
 //            try {
 //                String weatherJson = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
 //
-//                String[] weatherData = WeatherJsonUtils.parseWeatherJson(MainActivity.this, weatherJson);
+//                String[] weatherData = OpenWeatherMapJsonUtils.parseWeatherJson(MainActivity.this, weatherJson);
 //
 //                return weatherData;
 //            } catch (Exception e) {

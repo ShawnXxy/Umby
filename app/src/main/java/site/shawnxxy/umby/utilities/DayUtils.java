@@ -5,45 +5,83 @@ import android.text.format.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import site.shawnxxy.umby.R;
 
 
 public final class DayUtils {
 
-    public static final long SEC_IN_MILLIS = 1000;
-    public static final long MIN_IN_MILLIS = SEC_IN_MILLIS * 60;
-    public static final long HR_IN_MILLIS = MIN_IN_MILLIS * 60;
-    public static final long DAY_IN_MILLIS = HR_IN_MILLIS * 24;
+//    public static final long SEC_IN_MILLIS = 1000;
+//    public static final long MIN_IN_MILLIS = SEC_IN_MILLIS * 60;
+//    public static final long HR_IN_MILLIS = MIN_IN_MILLIS * 60;
+//    public static final long DAY_IN_MILLIS = HR_IN_MILLIS * 24;
 
+//    Milliseconds in a day
+    public static final long DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
+
+    /**
+     *  Return number of days since Jan 01, 1970, 12:00 Midnight UTC from passed date
+     */
     public static long getDayNumber(long date) {
-        TimeZone tz= TimeZone.getDefault();
-        long utcOffset = tz.getOffset(date);
-        return (date + utcOffset) / DAY_IN_MILLIS;
+//        TimeZone tz= TimeZone.getDefault();
+//        long utcOffset = tz.getOffset(date);
+//        return (date + utcOffset) / DAY_IN_MILLIS;
+        return TimeUnit.MICROSECONDS.toDays(date);
     }
 
     /**
-     * To make it easy to query for the exact date, we normalize all dates that go into
-     * the database to the start of the day in UTC time.
+     *  Return milliseconds (UTC / GMT) for today's date at midnight in the local time zone
      *
-     * @param date The UTC date to normalize
-     *
-     * @return The UTC date at 12 midnight
      */
-    public static long normalizeDate(long date) {
+    public static long millisToUtcToday() {
         // Normalize the start date to the beginning of the (UTC) day in local time
-        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
-        return retValNew;
+//        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
+
+        long utcNowInMillis = System.currentTimeMillis();
+        TimeZone currentTimeZone = TimeZone.getDefault();
+        long gmtOffsetInMillis = currentTimeZone.getOffset(utcNowInMillis);
+        // number of millis since Jan 01, 1970, 12:00 Midnight UTC
+        long numOfMillis = utcNowInMillis + gmtOffsetInMillis;
+        // Convert millis in number of days
+        long millisToDays = TimeUnit.MILLISECONDS.toDays(numOfMillis);
+        // convert number of days into millis in UTC
+        long millisToUtc= TimeUnit.DAYS.toMillis(millisToDays);
+//        return retValNew;
+        return millisToUtc;
     }
 
-    // Convert UTC to local time
+    /**
+    *   Convert passed in date in millis to UTC millis
+    */
+    public static long millisToDate(long date) {
+        long numOfDays = getDayNumber(date);
+        return numOfDays * DAY_IN_MILLIS;
+    }
+
+    /**
+     *  To check and ensure the values passed in is a valid millis
+     */
+    public static boolean isMillis(long millis) {
+        boolean isMillis = false;
+        if (millis % DAY_IN_MILLIS == 0) {
+            isMillis = true;
+        }
+        return isMillis;
+    }
+
+    /**
+     *      Convert UTC to local time
+      */
     public static long utcToLocalTime(long utcDate) {
         TimeZone tz = TimeZone.getDefault();
         long gmtOffset = tz.getOffset(utcDate);
         return utcDate - gmtOffset;
     }
 
-    // Convert local time to UTC
+    /**
+     *      Convert local time to UTC
+      */
     public static long localTimeToUTC (long localDate) {
         TimeZone tz = TimeZone.getDefault();
         long gmtOffset = tz.getOffset(localDate);
