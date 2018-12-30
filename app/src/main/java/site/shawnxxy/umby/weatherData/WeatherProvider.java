@@ -4,8 +4,11 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+
+import site.shawnxxy.umby.utilities.DayUtils;
 
 public class WeatherProvider extends ContentProvider {
 
@@ -31,7 +34,35 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] contentValues) {
-        throw new RuntimeException("");
+
+        final SQLiteDatabase db = weatherDbHelper.getWritableDatabase();
+
+        switch (uriMatcher.match(uri)) {
+            case CODE_WEATHER:
+                db.beginTransaction();
+                int rowsInserted = 0;
+                try {
+                    for (ContentValues value : contentValues) {
+                        long weatherData = value.getAsLong(WeatherContract.WeatherEntry.COLUMN_DATE);
+                        if (!DayUtils.isMillis(weatherData)) {
+                            throw new IllegalArgumentException("Date must be in millisecond to be inserted!");
+                        }
+                        long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
+                        if (id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                return rowsInserted;
+
+            default:
+                return super.bulkInsert(uri, contentValues);
+        }
+
     }
 
     @Override
