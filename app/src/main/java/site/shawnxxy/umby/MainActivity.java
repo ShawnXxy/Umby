@@ -3,10 +3,13 @@ package site.shawnxxy.umby;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriMatcher;
+import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,22 +27,44 @@ import java.net.URL;
 
 import site.shawnxxy.umby.utilities.NetworkUtils;
 import site.shawnxxy.umby.utilities.OpenWeatherMapJsonUtils;
+import site.shawnxxy.umby.weatherData.FakeDataUtils;
 import site.shawnxxy.umby.weatherData.Location;
+import site.shawnxxy.umby.weatherData.WeatherContract;
 
-public class MainActivity extends AppCompatActivity implements WeatherAdapter.WeatherAdapterOnCLickHandler, LoaderManager.LoaderCallbacks<String[]>, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements
+        WeatherAdapter.WeatherAdapterOnCLickHandler,
+        LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    public static final String[] MAIN_FORECAST_PROJECTION = {
+            WeatherContract.WeatherEntry.COLUMN_DATE,
+            WeatherContract.WeatherEntry.COLUMN_MAX_TEMPERATURE,
+            WeatherContract.WeatherEntry.COLUMN_MIN_TEMPERATURE,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+    };
+
+    /**
+     *  Index used to quickly query in SQL db
+     */
+    public static final int INDEX_WEATHER_DATE = 0;
+    public static final int INDEX_WEATHER_MAX_TEMPERATURE = 1;
+    public static final int INDEX_WEATHER_MIN_TEMPERATURE = 2;
+    public static final int INDEX_WEATHER_CONDITION_ID = 3;
 
     // Field to display the weather
 //    private TextView weatherDataTextView;
     private RecyclerView weatherDataRecyclerView;
     private WeatherAdapter weatherAdapter;
+    private int position = RecyclerView.NO_POSITION;
+
     // Field to display error message if any
-    private TextView errorMsg;
+//    private TextView errorMsg;
+
     // Field to display progressbar if available
     private ProgressBar loadingProgressBar;
 
-    private static final int FORECAST_LOADER_ID = 0;
+    private static final int FORECAST_LOADER_ID = 596; // number is dummy
 
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
@@ -47,9 +72,13 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setElevation(0f);
+
+        FakeDataUtils.insertFakeData(this);
 
         //get reference for weather data
         weatherDataRecyclerView = findViewById(R.id.weather_data_recyclerview);
+
         //dummy data for test
 //        String[] dummyWeatherPool = {
 //                "Today, May 17 - Clear - 17°C / 15°C",
@@ -73,7 +102,10 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
 //        }
 
         // get reference for error message
-        errorMsg = findViewById(R.id.error_msg);
+//        errorMsg = findViewById(R.id.error_msg);
+
+        // ger reference for loading progress bar
+        loadingProgressBar = findViewById(R.id.loading_progressbar);
 
         // Support vertical or horizontal orientations
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -83,81 +115,113 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         weatherDataRecyclerView.setHasFixedSize(true);
 
         // Linking weather data with the views in the end of recyclerview list
-        weatherAdapter = new WeatherAdapter(this);
+        weatherAdapter = new WeatherAdapter(this, this);
         weatherDataRecyclerView.setAdapter(weatherAdapter);
 
-        // ger reference for loading progress bar
-        loadingProgressBar = findViewById(R.id.loading_progressbar);
+        showLoading();
 
         // Implement AsyncTaskLoader
-        int loaderId = FORECAST_LOADER_ID;
-        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
-        Bundle bundleforLoader = null;
-        getSupportLoaderManager().initLoader(loaderId, bundleforLoader, callbacks);
+//        int loaderId = FORECAST_LOADER_ID;
+//        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
+//        Bundle bundleforLoader = null;
+//        getSupportLoaderManager().initLoader(loaderId, bundleforLoader, callbacks);
+        getSupportLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
 
-        Log.d(TAG, "onCreate: registering preference changed listener");
-
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+//        Log.d(TAG, "onCreate: registering preference changed listener");
+//
+//        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
 //        loadWeatherData();
     }
 
     @Override
-    public Loader<String[]> onCreateLoader(int id, final Bundle loaderArgs) {
-        return new AsyncTaskLoader<String[]>(this) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
-            String[] weatherData = null;
+        switch (id) {
+            case FORECAST_LOADER_ID:
+                Uri forecastQueryUri = WeatherContract.WeatherEntry.CONTENT_URI;
+                String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+                String selection = WeatherContract.WeatherEntry.getSqlSelectForToday();
+                return new CursorLoader(this,
+                        forecastQueryUri,
+                        MAIN_FORECAST_PROJECTION,
+                        selection,
+                        null,
+                        sortOrder);
+            default:
+                throw new RuntimeException("Loader Not Impletementd: " + id);
+        }
 
-            @Override
-            protected void onStartLoading() {
-                if (weatherData != null) {
-                    deliverResult(weatherData);
-                } else {
-                    loadingProgressBar.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
+        /**
+         *  REMOVE BELOW FOR REFRACTOR
+         */
+//        return new AsyncTaskLoader<String[]>(this) {
+//
+//            String[] weatherData = null;
 
-            @Override
-            public String[] loadInBackground() {
-                String locationQuery = Location.getPrefLocation(MainActivity.this);
-
-                URL weatherRequestUrl = NetworkUtils.buildUrl(locationQuery);
-
-                try {
-                    String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
-
-                    String[] jsonWeatherData = OpenWeatherMapJsonUtils.parseWeatherJson(MainActivity.this, jsonWeatherResponse);
-
-                    return jsonWeatherData;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            public void deliverResult(String[] data) {
-                weatherData = data;
-                super.deliverResult(data);
-            }
-        };
+//            @Override
+//            protected void onStartLoading() {
+//                if (weatherData != null) {
+//                    deliverResult(weatherData);
+//                } else {
+//                    loadingProgressBar.setVisibility(View.VISIBLE);
+//                    forceLoad();
+//                }
+//            }
+//
+//            @Override
+//            public String[] loadInBackground() {
+//                String locationQuery = Location.getPrefLocation(MainActivity.this);
+//
+//                URL weatherRequestUrl = NetworkUtils.buildUrl(locationQuery);
+//
+//                try {
+//                    String jsonWeatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherRequestUrl);
+//
+//                    String[] jsonWeatherData = OpenWeatherMapJsonUtils.parseWeatherJson(MainActivity.this, jsonWeatherResponse);
+//
+//                    return jsonWeatherData;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//            }
+//
+//            public void deliverResult(String[] data) {
+//                weatherData = data;
+//                super.deliverResult(data);
+//            }
+//        };
     }
 
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
-        loadingProgressBar.setVisibility(View.INVISIBLE);
-        weatherAdapter.setNewWeatherData(data);
-        if (null == data) {
-            weatherDataRecyclerView.setVisibility(View.INVISIBLE);
-            errorMsg.setVisibility(View.VISIBLE);
-        } else {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        weatherAdapter.swapCursor(data);
+        if (position == RecyclerView.NO_POSITION) {
+            position = 0;
+        }
+        weatherDataRecyclerView.smoothScrollToPosition(position);
+
+        if (data.getCount() != 0) {
             showWeatherData();
         }
+
+        /**
+         *  REMOVE BELOW FOR REFRACTOR
+         */
+//        loadingProgressBar.setVisibility(View.INVISIBLE);
+//        weatherAdapter.setNewWeatherData(data);
+//        if (null == data) {
+//            weatherDataRecyclerView.setVisibility(View.INVISIBLE);
+//            errorMsg.setVisibility(View.VISIBLE);
+//        } else {
+//            showWeatherData();
+//        }
     }
 
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
-
+    public void onLoaderReset(Loader<Cursor> loader) {
+        weatherAdapter.swapCursor(null);
     }
 
     @Override
@@ -171,30 +235,42 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-    }
+    /**
+     *  REMOVE BELOW FOR REFRACTOR
+     */
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+//    }
 
     /**
      *  Helper function used to hide weather data when refreshing
+     *  REMOVE BELOW FOR REFRACTOR
      */
-    private void hideWeatherData() {
-        weatherAdapter.setNewWeatherData(null);
-    }
+//    private void hideWeatherData() {
+//        weatherAdapter.setNewWeatherData(null);
+//    }
 
     /**
      *     helper function to display weather data
      */
     private void showWeatherData() {
         // if there is error msg
-        errorMsg.setVisibility(View.INVISIBLE);
+//        errorMsg.setVisibility(View.INVISIBLE);
+
+        loadingProgressBar.setVisibility(View.INVISIBLE);
         weatherDataRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoading() {
+        weatherDataRecyclerView.setVisibility(View.INVISIBLE);
+        loadingProgressBar.setVisibility(View.VISIBLE);
     }
 
     /**
      *     get location to load weather data
+     *     REMOVE BELOW FOR REFRACTOR
      */
 //    private void loadWeatherData() {
 //        showWeatherData();
@@ -221,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
 
     /**
      *     network request
+     *     REMOVE BELOW FOR REFRACTOR
      */
 //    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 //
@@ -280,8 +357,13 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
      *  Help function to load map
      */
     private void openLocationMap() {
-        String address = Location.getPrefLocation(this);
-        Uri geoLocation = Uri.parse("geo:0,0?q=" + address);
+//        String address = Location.getPrefLocation(this);
+
+        double[] coords = Location.getLocationCoord(this);
+        String lat = Double.toString(coords[0]);
+        String lon = Double.toString(coords[1]);
+//        Uri geoLocation = Uri.parse("geo:0,0?q=" + address);
+        Uri geoLocation = Uri.parse("geo: " + lat + ", " + lon);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
@@ -309,14 +391,15 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-//            weatherDataTextView.setText("");
-//            weatherAdapter.setNewWeatherData(null);
-            hideWeatherData();
-//            loadWeatherData();
-            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
-            return true;
-        }
+
+//        if (id == R.id.action_refresh) {
+////            weatherDataTextView.setText("");
+////            weatherAdapter.setNewWeatherData(null);
+//            hideWeatherData();
+////            loadWeatherData();
+//            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+//            return true;
+//        }
 
         // open map when clicked
         if (id == R.id.action_map) {
@@ -334,8 +417,11 @@ public class MainActivity extends AppCompatActivity implements WeatherAdapter.We
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        PREFERENCES_HAVE_BEEN_UPDATED = true;
-    }
+    /**
+     *  REMOVE BELOW FOR REFRACTOR
+     */
+//    @Override
+//    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+//        PREFERENCES_HAVE_BEEN_UPDATED = true;
+//    }
 }
