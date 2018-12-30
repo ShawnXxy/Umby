@@ -6,6 +6,8 @@
     <!--error message shown if refresh failed-->
     <string name="error_msg">An error occurred. Please check your Internet and try again!</string>
 
+    <string name="content_authority">site.shawnxxy.umby</string>
+
     <!--menu for map-->
     <string name="action_map">Map Location</string>
     <string name="action_share">Share</string>
