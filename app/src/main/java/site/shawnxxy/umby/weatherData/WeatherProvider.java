@@ -107,7 +107,32 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        throw new RuntimeException("");
+
+        int rowsDeleted;
+
+        // if null was passed in, the whole table will be deleted. "1" indicated all rows deleted
+        if (null == selection) {
+            selection ="1";
+        }
+
+        switch (uriMatcher.match(uri)) {
+            case CODE_WEATHER:
+                rowsDeleted = weatherDbHelper.getWritableDatabase().delete(
+                        WeatherContract.WeatherEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs
+                );
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsDeleted;
     }
 
     @Override
