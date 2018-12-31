@@ -20,7 +20,7 @@ import static site.shawnxxy.umby.utilities.WeatherUtils.getWeatherCondition;
 public final class OpenWeatherMapJsonUtils {
 
     private static final String OWM_CITY = "city";
-    private static final String OWM_COOR = "coord";
+    private static final String OWM_COORD = "coord";
     private static final String OWM_LAT = "lat";
     private static final String OWM_LON = "lon";
     private static final String OWM_LIST = "list";
@@ -45,7 +45,7 @@ public final class OpenWeatherMapJsonUtils {
 //        final String WEATHER_DESCRIPTION = "description";
 //        final String WEATHER_MSG_CODE = "msg";
 
-        String[] parsedWeatherData = null; // String array to hold each day's weather String
+        String[] parsedWeatherData; // String array to hold each day's weather String
 
         JSONObject forecastJson = new JSONObject(weatherStr);
 
@@ -101,9 +101,9 @@ public final class OpenWeatherMapJsonUtils {
     }
 
     // Parse JSON and convert it into ContentValues that can be inserted into database
-    public static ContentValues[] getFullWeatherInfo(Context c, String forcastStr) throws JSONException{
+    public static ContentValues[] getFullWeatherInfo(Context c, String forecastStr) throws JSONException{
 
-        JSONObject forecastJson = new JSONObject(forcastStr);
+        JSONObject forecastJson = new JSONObject(forecastStr);
 
         if (forecastJson.has(OWM_MSG_CODE)) {
             int errorCode = forecastJson.getInt(OWM_MSG_CODE);
@@ -119,7 +119,7 @@ public final class OpenWeatherMapJsonUtils {
 
         JSONArray weatherJsonArray = forecastJson.getJSONArray(OWM_LIST);
         JSONObject cityObj = forecastJson.getJSONObject(OWM_CITY);
-        JSONObject coord = cityObj.getJSONObject(OWM_COOR);
+        JSONObject coord = cityObj.getJSONObject(OWM_COORD);
         double lat = coord.getDouble(OWM_LAT);
         double lon = coord.getDouble(OWM_LON);
         Location.setLocationCoord(c, lat, lon);

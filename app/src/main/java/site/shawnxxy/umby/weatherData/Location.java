@@ -55,16 +55,17 @@ public class Location {
     //Returns true if the user has selected metric temperature display.
     public static boolean isMetric(Context c) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
+
         String keyForUnits = c.getString(R.string.pref_units_key);
         String defaultUnits = c.getString(R.string.pref_units_metric);
         String prefUnits = preferences.getString(keyForUnits, defaultUnits);
         String metric = c.getString(R.string.pref_units_metric);
-        boolean userPrefMetrics;
+
+        boolean userPrefMetrics = false;
         if (metric.equals(prefUnits)) {
             userPrefMetrics = true;
-        } else {
-            userPrefMetrics =false;
         }
+
         return userPrefMetrics;
     }
 

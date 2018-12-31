@@ -25,7 +25,8 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
      */
     final WeatherAdapterOnCLickHandler clickHandler;
     public interface WeatherAdapterOnCLickHandler {
-        void onClick(String weatherForDay);
+//        void onClick(String weatherForDay);
+        void onClick(long date);
     }
 
     private Cursor cursor;
@@ -49,6 +50,7 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
         boolean attachToParent = false;
 
         View view = inflater.inflate(weatherDataList, viewGroup, attachToParent);
+        view.setFocusable(true);
         return new WeatherAdapterViewHolder(view);
     }
 
@@ -97,11 +99,12 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
 
         @Override
         public void onClick(View v) {
-//            int adapterPosition = getAdapterPosition();
+            int adapterPosition = getAdapterPosition();
 //            String weatherForDay = weatherData[adapterPosition];
-
-            String weatherForDay = weatherDataTextView.getText().toString();
-            clickHandler.onClick(weatherForDay);
+            cursor.moveToPosition(adapterPosition);
+//            String weatherForDay = weatherDataTextView.getText().toString();
+            long dateInMillis = cursor.getLong(MainActivity.INDEX_WEATHER_DATE);
+            clickHandler.onClick(dateInMillis);
         }
     }
 
@@ -112,10 +115,9 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
     public int getItemCount() {
         if (null == cursor) {
             return 0;
-        } else {
-//            return weatherData.length;
-            return cursor.getCount();
         }
+//            return weatherData.length;
+        return cursor.getCount();
     }
 
     void swapCursor(Cursor newCursor) {

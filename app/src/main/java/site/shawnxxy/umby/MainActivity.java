@@ -1,14 +1,9 @@
 package site.shawnxxy.umby;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -21,21 +16,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import java.net.URL;
-
-import site.shawnxxy.umby.utilities.NetworkUtils;
-import site.shawnxxy.umby.utilities.OpenWeatherMapJsonUtils;
-import site.shawnxxy.umby.weatherData.FakeDataUtils;
+import site.shawnxxy.umby.utilities.FakeDataUtils;
 import site.shawnxxy.umby.weatherData.Location;
 import site.shawnxxy.umby.weatherData.WeatherContract;
 
-public class MainActivity extends AppCompatActivity implements
-        WeatherAdapter.WeatherAdapterOnCLickHandler,
-        LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, WeatherAdapter.WeatherAdapterOnCLickHandler{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private final String TAG = MainActivity.class.getSimpleName();
 
     public static final String[] MAIN_FORECAST_PROJECTION = {
             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -52,21 +40,27 @@ public class MainActivity extends AppCompatActivity implements
     public static final int INDEX_WEATHER_MIN_TEMPERATURE = 2;
     public static final int INDEX_WEATHER_CONDITION_ID = 3;
 
-    // Field to display the weather
+    private static final int FORECAST_LOADER_ID = 596; // number is dummy
+
+    /**
+     *      Field to display the weather
+      */
 //    private TextView weatherDataTextView;
     private RecyclerView weatherDataRecyclerView;
     private WeatherAdapter weatherAdapter;
     private int position = RecyclerView.NO_POSITION;
 
-    // Field to display error message if any
+    /**
+     *      Field to display error message if any
+     */
 //    private TextView errorMsg;
 
-    // Field to display progressbar if available
+    /**
+     *      Field to display progressbar if available
+     */
     private ProgressBar loadingProgressBar;
 
-    private static final int FORECAST_LOADER_ID = 596; // number is dummy
-
-    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
+//    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,16 +218,16 @@ public class MainActivity extends AppCompatActivity implements
         weatherAdapter.swapCursor(null);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (PREFERENCES_HAVE_BEEN_UPDATED) {
-            Log.d(TAG, "onStart: preferences were updated");
-            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
-            PREFERENCES_HAVE_BEEN_UPDATED = false;
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        if (PREFERENCES_HAVE_BEEN_UPDATED) {
+//            Log.d(TAG, "onStart: preferences were updated");
+//            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+//            PREFERENCES_HAVE_BEEN_UPDATED = false;
+//        }
+//    }
 
     /**
      *  REMOVE BELOW FOR REFRACTOR
@@ -283,16 +277,21 @@ public class MainActivity extends AppCompatActivity implements
      *    Show message when is clicked
      */
     @Override
-    public void onClick(String weatherForDay) {
-        Context context = this;
+    public void onClick(long date) {
+//        Context context = this;
 //        Toast.makeText(context, weatherForDay, Toast.LENGTH_SHORT).show();
 
         // A new activity will start to load weather details if click on it
-        Class destination = WeatherDetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destination);
+//        Class destination = WeatherDetailActivity.class;
+//        Intent intentToStartDetailActivity = new Intent(context, destination);
         // Pass weather data to detail activity
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
-        startActivity(intentToStartDetailActivity);
+//        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+//        startActivity(intentToStartDetailActivity);
+
+        Intent weatherDetailIntent =  new Intent(MainActivity.this, WeatherDetailActivity.class);
+        Uri uriForDateClicked = WeatherContract.WeatherEntry.buildWeatherUriWithDate(date);
+        weatherDetailIntent.setData(uriForDateClicked);
+        startActivity(weatherDetailIntent);
     }
 
     /**

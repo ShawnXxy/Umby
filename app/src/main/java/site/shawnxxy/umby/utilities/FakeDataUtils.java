@@ -1,4 +1,4 @@
-package site.shawnxxy.umby.weatherData;
+package site.shawnxxy.umby.utilities;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import site.shawnxxy.umby.utilities.DayUtils;
+import site.shawnxxy.umby.weatherData.WeatherContract;
 
 public class FakeDataUtils {
 

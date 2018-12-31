@@ -1,5 +1,6 @@
 package site.shawnxxy.umby.weatherData;
 
+import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -55,6 +56,10 @@ public class WeatherProvider extends ContentProvider {
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
                 }
 
                 return rowsInserted;
@@ -148,5 +153,16 @@ public class WeatherProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         throw new RuntimeException("");
+    }
+
+    /**
+     * Dummy test
+     * http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
+     */
+    @Override
+    @TargetApi(11)
+    public void shutdown() {
+        weatherDbHelper.close();
+        super.shutdown();
     }
 }

@@ -18,12 +18,13 @@ public final class WeatherUtils {
 
     // format temperature in C or F with no decimal
     public static String formatTemperature(Context c,double temperature) {
-        int temperatureResourceId = R.string.temperature_in_C;
+//        int temperatureResourceId = R.string.temperature_in_C;
 
         if (!Location.isMetric(c)) {
             temperature = celsToFa(temperature);
-            temperatureResourceId = R.string.temperature_in_F;
+//            temperatureResourceId = R.string.temperature_in_F;
         }
+        int temperatureResourceId = R.string.format_temperature;
 
         return String.format(c.getString(temperatureResourceId), temperature);
     }
@@ -259,7 +260,7 @@ public final class WeatherUtils {
             return R.drawable.ic_snow;
         } else if (weatherId >= 701 && weatherId <= 761) {
             return R.drawable.ic_fog;
-        } else if (weatherId == 761 || weatherId == 781) {
+        } else if (weatherId == 761 || weatherId == 771 || weatherId == 781) {
             return R.drawable.ic_storm;
         } else if (weatherId == 800) {
             return R.drawable.ic_clear;
@@ -267,8 +268,17 @@ public final class WeatherUtils {
             return R.drawable.ic_light_clouds;
         } else if (weatherId >= 802 && weatherId <= 804) {
             return R.drawable.ic_cloudy;
+        } else if (weatherId >= 900 && weatherId <= 906) {
+            return R.drawable.ic_storm;
+        } else if (weatherId >= 958 && weatherId <= 962) {
+            return R.drawable.ic_storm;
+        } else if (weatherId >= 951 && weatherId <= 957) {
+            return R.drawable.ic_clear;
         }
-        return -1;
+
+//        return -1;
+        Log.e(LOG_TAG, "Unknown weather: " + weatherId);
+        return R.drawable.ic_storm;
     }
 
     public static int getWeatherArt(int weatherId) {

@@ -127,13 +127,26 @@ public final class DayUtils {
     private static String getDay(Context c, long dateInMillis) {
         long dayNum = getDayNumber(dateInMillis);
         long currentDayNum = getDayNumber(System.currentTimeMillis());
-        if (dayNum == currentDayNum) {
-            return c.getString(R.string.today);
-        } else if (dayNum == currentDayNum + 1) {
-            return c.getString(R.string.tomorrow);
-        } else {
-            SimpleDateFormat day = new SimpleDateFormat("EEEE");
-            return day.format(dateInMillis);
+
+        int daysAfterToday = (int) (dayNum - currentDayNum);
+
+        switch (daysAfterToday) {
+            case 0:
+                return c.getString(R.string.today);
+            case 1:
+                return c.getString(R.string.tomorrow);
+            default:
+                SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
+                return dayFormat.format(dateInMillis);
         }
+
+//        if (dayNum == currentDayNum) {
+//            return c.getString(R.string.today);
+//        } else if (dayNum == currentDayNum + 1) {
+//            return c.getString(R.string.tomorrow);
+//        } else {
+//            SimpleDateFormat day = new SimpleDateFormat("EEEE");
+//            return day.format(dateInMillis);
+//        }
     }
 }
