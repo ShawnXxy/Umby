@@ -9,7 +9,7 @@ import site.shawnxxy.umby.sync.SyncIntentService;
 
 public class SyncUtils {
 
-    public static void StartSyncImmediately (@NonNull final Context context) {
+    public static void startSyncImmediately (@NonNull final Context context) {
         Intent intentToSync = new Intent(context, SyncIntentService.class);
         context.startService(intentToSync);
     }

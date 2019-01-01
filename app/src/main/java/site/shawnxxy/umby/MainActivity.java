@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         getSupportLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
 
-        SyncUtils.StartSyncImmediately(this);
+        SyncUtils.startSyncImmediately(this);
 
 //        Log.d(TAG, "onCreate: registering preference changed listener");
 //

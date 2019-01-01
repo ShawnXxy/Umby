@@ -9,6 +9,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 
+import site.shawnxxy.umby.utilities.SyncUtils;
 import site.shawnxxy.umby.weatherData.Location;
 import site.shawnxxy.umby.weatherData.WeatherContract;
 
@@ -63,6 +64,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         if (key.equals(getString(R.string.pref_location_key))) {
             Location.resetLocationCoord(activity);
+            SyncUtils.startSyncImmediately(activity);
         } else if (key.equals(getString(R.string.pref_units_key))) {
             activity.getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         }
