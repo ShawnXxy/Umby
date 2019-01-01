@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import site.shawnxxy.umby.utilities.FakeDataUtils;
+import site.shawnxxy.umby.utilities.SyncUtils;
 import site.shawnxxy.umby.weatherData.Location;
 import site.shawnxxy.umby.weatherData.WeatherContract;
 
@@ -68,7 +69,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0f);
 
-        FakeDataUtils.insertFakeData(this);
+        /**
+         *  For testing ONLY.
+         */
+//        FakeDataUtils.insertFakeData(this);
 
         //get reference for weather data
         weatherDataRecyclerView = findViewById(R.id.weather_data_recyclerview);
@@ -114,12 +118,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         showLoading();
 
-        // Implement AsyncTaskLoader
+        /**
+         *          Implement AsyncTaskLoader
+          */
 //        int loaderId = FORECAST_LOADER_ID;
 //        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
 //        Bundle bundleforLoader = null;
 //        getSupportLoaderManager().initLoader(loaderId, bundleforLoader, callbacks);
+
+
         getSupportLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
+
+        SyncUtils.StartSyncImmediately(this);
 
 //        Log.d(TAG, "onCreate: registering preference changed listener");
 //
