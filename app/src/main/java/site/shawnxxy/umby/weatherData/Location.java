@@ -97,6 +97,17 @@ public class Location {
         return isLatLonValid;
     }
 
+    public static boolean notificationEnabled(Context context) {
+        String displayNotificationKey = context.getString(R.string.pref_enable_notifications_key);
+
+        boolean shouldDisplayNotificationByDefault = context.getResources().getBoolean(R.bool.show_notifications_by_default);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean shouldDisplayNotification = sp.getBoolean(displayNotificationKey, shouldDisplayNotificationByDefault);
+
+        return shouldDisplayNotification;
+    }
+
 //    private static String getDefaultLocation() {
 //
 //        return DEFAULT_LOCATION;

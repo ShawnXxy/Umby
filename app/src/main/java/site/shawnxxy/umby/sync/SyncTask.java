@@ -6,8 +6,11 @@ import android.content.Context;
 
 import java.net.URL;
 
+import site.shawnxxy.umby.utilities.DayUtils;
 import site.shawnxxy.umby.utilities.NetworkUtils;
+import site.shawnxxy.umby.utilities.NotificationUtils;
 import site.shawnxxy.umby.utilities.OpenWeatherMapJsonUtils;
+import site.shawnxxy.umby.weatherData.Location;
 import site.shawnxxy.umby.weatherData.WeatherContract;
 
 public class SyncTask {
@@ -25,6 +28,21 @@ public class SyncTask {
                 ContentResolver contentResolver = context.getContentResolver();
                 contentResolver.delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
                 contentResolver.bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValues);
+            }
+
+            // check if notification is enabled
+            boolean checkNotificationsEnabled = Location.notificationEnabled(context);
+
+            // check if one day passed since last notification
+            long timeSinceLastNotification = Location.getEllapsedTimeSinceLastNotification(context);
+            boolean oneDayPassedSinceLastNotification = false;
+            if (timeSinceLastNotification >= DayUtils.DAY_IN_MILLIS) {
+                oneDayPassedSinceLastNotification = true;
+            }
+
+            // send notification
+            if (checkNotificationsEnabled && oneDayPassedSinceLastNotification) {
+                NotificationUtils.weatherNotification(context);
             }
 
         } catch (Exception e) {

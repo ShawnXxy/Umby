@@ -245,7 +245,7 @@ public final class WeatherUtils {
     }
 
     // get weather icon based on weather condition: https://openweathermap.org/weather-conditions
-    public static int getWeatherIcon(int weatherId) {
+    public static int getSmallWeatherIcon(int weatherId) {
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.ic_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
@@ -281,7 +281,7 @@ public final class WeatherUtils {
         return R.drawable.ic_storm;
     }
 
-    public static int getWeatherArt(int weatherId) {
+    public static int getLargeWeatherIcon(int weatherId) {
 
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.art_storm;
