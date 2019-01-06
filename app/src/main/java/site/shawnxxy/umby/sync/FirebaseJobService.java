@@ -17,6 +17,7 @@ public class FirebaseJobService extends JobService {
             protected Void doInBackground(Void... voids) {
                 Context context = getApplicationContext();
                 SyncTask.syncWeather(context);
+                jobFinished(params, false);
                 return null;
             }
 

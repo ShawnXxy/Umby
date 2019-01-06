@@ -39,7 +39,7 @@ public class SyncUtils {
      *  Schedule periodic weather sync
      */
     static void scheduleWeatherSync(@NonNull final Context context) {
-        com.firebase.jobdispatcher.Driver driver = new GooglePlayDriver(context);
+        Driver driver = new GooglePlayDriver(context);
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(driver);
 
         Job syncJob = dispatcher.newJobBuilder()
