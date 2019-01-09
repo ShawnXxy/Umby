@@ -17,6 +17,9 @@ import site.shawnxxy.umby.weatherData.Location;
 
 class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder> {
 
+    private static final int VIEW_TYPE_TODAY = 0;
+    private static final int VIEW_TYPE_FUTURE = 1;
+
     private final Context context;
 
 //    private String[] weatherData;
@@ -30,6 +33,8 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
         void onClick(long date);
     }
 
+    private boolean useTodayLayout;
+
     private Cursor cursor;
 
 //    public WeatherAdapter(WeatherAdapterOnCLickHandler handler) {
@@ -38,6 +43,7 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
     public WeatherAdapter(@NonNull Context c, WeatherAdapterOnCLickHandler handler) {
         context = c;
         clickHandler = handler;
+        useTodayLayout = context.getResources().getBoolean(R.bool.use_today_layout);
     }
 
     /**
@@ -45,13 +51,33 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
      */
     @Override
     public WeatherAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+        int layoutId;
+
+        switch (viewType) {
+            // Use today layout for today
+            case VIEW_TYPE_TODAY: {
+                layoutId = R.layout.today_weather_list;
+                break;
+            }
+
+            // Use list layout for future
+            case VIEW_TYPE_FUTURE: {
+                layoutId = R.layout.weather_data_list;
+                break;
+            }
+
+            default:
+                throw new IllegalArgumentException("Invalid view type, value of " + viewType);
+        }
+
 //        Context context = viewGroup.getContext();
-        int weatherDataList = R.layout.weather_data_list;
+//        int weatherDataList = R.layout.weather_data_list;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean attachToParent = false;
 
-        View view = inflater.inflate(weatherDataList, viewGroup, attachToParent);
-//        view.setFocusable(true);
+        View view = inflater.inflate(layoutId, viewGroup, attachToParent);
+        view.setFocusable(true);
         return new WeatherAdapterViewHolder(view);
     }
 
@@ -65,24 +91,52 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
 
         cursor.moveToPosition(position);
 
-        //  Match weather icon
+        /**
+        *   Match weather icon
+         */
         int weatherId = cursor.getInt(MainActivity.INDEX_WEATHER_CONDITION_ID);
         int weatherImageId;
-        weatherImageId = WeatherUtils.getSmallWeatherIcon(weatherId);
+//        weatherImageId = WeatherUtils.getSmallWeatherIcon(weatherId);
+
+        int viewType = getItemViewType(position);
+
+        switch (viewType) {
+            // display large icon if layout is for today
+            case VIEW_TYPE_TODAY: {
+                weatherImageId = WeatherUtils.getLargeWeatherIcon(weatherId);
+                break;
+            }
+
+            case VIEW_TYPE_FUTURE: {
+                weatherImageId = WeatherUtils.getSmallWeatherIcon(weatherId);
+                break;
+            }
+
+            default:
+                throw new IllegalArgumentException("Invalid view type, value of " + viewType);
+
+        }
+
         weatherAdapterViewHolder.iconImageView.setImageResource(weatherImageId);
 
-        // read data from the cursor based on date
+        /**
+         *          read data from the cursor based on date
+          */
         long dateInMillis = cursor.getLong(MainActivity.INDEX_WEATHER_DATE);
         String dateStr = DayUtils.dateFormatted(context, dateInMillis, false);
         weatherAdapterViewHolder.dateTextView.setText(dateStr);
 
-        // Use weather id to get weather description
+        /**
+         *         Use weather id to get weather description
+         */
         String descriptionStr = WeatherUtils.getWeatherCondition(context, weatherId);
         String descriptionAlly = context.getString(R.string.a11y_forecast, descriptionStr);
         weatherAdapterViewHolder.descriptionTextView.setText(descriptionStr);
         weatherAdapterViewHolder.descriptionTextView.setContentDescription(descriptionAlly);
 
-        // get high and low temperature
+        /**
+         *         get high and low temperature
+          */
         double highInCels = cursor.getDouble(MainActivity.INDEX_WEATHER_MAX_TEMPERATURE);
         double lowInCels = cursor.getDouble(MainActivity.INDEX_WEATHER_MIN_TEMPERATURE);
         String highStr = WeatherUtils.formatTemperature(context, highInCels);
@@ -151,6 +205,15 @@ class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherAdapterV
     void swapCursor(Cursor newCursor) {
         cursor = newCursor;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (useTodayLayout && position == 0) {
+            return VIEW_TYPE_TODAY;
+        } else {
+            return VIEW_TYPE_FUTURE;
+        }
     }
 
     /**
