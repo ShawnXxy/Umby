@@ -7,12 +7,13 @@
         android:id="@+id/details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="16dp"
-        android:paddingEnd="32dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:paddingStart="32dp"
-        android:paddingTop="16dp">
+        android:background="@color/detail_accent_pane_background"
+        android:paddingBottom="@dimen/vertical_padding"
+        android:paddingEnd="@dimen/horizontal_padding"
+        android:paddingLeft="@dimen/horizontal_padding"
+        android:paddingRight="@dimen/horizontal_padding"
+        android:paddingStart="@dimen/horizontal_padding"
+        android:paddingTop="@dimen/vertical_padding">
 
         <android.support.constraint.Guideline
             android:id="@+id/divider"
@@ -21,18 +22,17 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5"/>
 
-        <!-- Humidity label -->
         <TextView
             android:id="@+id/humidity_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/humidity_label"
             app:layout_constraintBottom_toTopOf="@+id/pressure_label"
             app:layout_constraintLeft_toLeftOf="@+id/details"
             app:layout_constraintTop_toTopOf="@+id/details"
             app:layout_constraintVertical_bias="0.33"/>
 
-        <!-- Humidity measurement -->
         <TextView
             android:id="@+id/humidity"
             android:layout_height="wrap_content"
@@ -41,17 +41,16 @@
             app:layout_constraintLeft_toLeftOf="@+id/divider"
             tools:text="38%"/>
 
-        <!-- Pressure label -->
         <TextView
             android:id="@+id/pressure_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/pressure_label"
             app:layout_constraintBottom_toBottomOf="@+id/details"
             app:layout_constraintLeft_toLeftOf="@+id/details"
             app:layout_constraintTop_toTopOf="@+id/details"/>
 
-        <!-- Pressure measurement -->
         <TextView
             android:id="@+id/pressure"
             android:layout_height="wrap_content"
@@ -60,18 +59,17 @@
             app:layout_constraintLeft_toLeftOf="@+id/divider"
             tools:text="995 hPa"/>
 
-        <!-- Wind label -->
         <TextView
             android:id="@+id/wind_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:fontFamily="sans-serif"
             android:text="@string/wind_label"
             app:layout_constraintBottom_toBottomOf="@+id/details"
             app:layout_constraintLeft_toLeftOf="@+id/details"
             app:layout_constraintTop_toBottomOf="@+id/pressure_label"
             app:layout_constraintVertical_bias="0.65999997"/>
 
-        <!-- Wind measurement -->
         <TextView
             android:id="@+id/wind_measurement"
             android:layout_height="wrap_content"
