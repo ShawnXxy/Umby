@@ -51,7 +51,7 @@ public class NotificationUtils {
             Resources resources = context.getResources();
             int smallResourceId = WeatherUtils.getSmallWeatherIcon(weatherId);
             int largeResourceId = WeatherUtils.getLargeWeatherIcon(weatherId);
-            Bitmap icon = BitmapFactory.decodeResource(resources, smallResourceId);
+            Bitmap icon = BitmapFactory.decodeResource(resources, largeResourceId);
 
             String notificationTitle = context.getString(R.string.app_name);
             String notificationText = getNofiicationText(context, weatherId, high, low);

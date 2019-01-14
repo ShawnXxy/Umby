@@ -402,15 +402,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-//        if (id == R.id.action_refresh) {
-////            weatherDataTextView.setText("");
-////            weatherAdapter.setNewWeatherData(null);
-//            hideWeatherData();
-////            loadWeatherData();
-//            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
-//            return true;
-//        }
-
         // open map when clicked
         if (id == R.id.action_map) {
             openLocationMap();

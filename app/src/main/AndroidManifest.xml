@@ -27,6 +27,7 @@
         <activity
             android:name=".WeatherDetailActivity"
             android:label="@string/title_activity_detail"
+            android:theme="@style/AppTheme"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

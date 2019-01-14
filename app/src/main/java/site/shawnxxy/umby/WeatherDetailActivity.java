@@ -69,7 +69,8 @@ public class WeatherDetailActivity extends AppCompatActivity implements LoaderMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather_detail);
+
+//        setContentView(R.layout.activity_weather_detail);
 
 //        weatherDetail = findViewById(R.id.weather_details_textview);
 //        dateTextView = findViewById(R.id.date);

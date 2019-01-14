@@ -21,16 +21,6 @@ public final class DayUtils {
     public static final long DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
 
     /**
-     *  Return number of days since Jan 01, 1970, 12:00 Midnight UTC from passed date (current date)
-     */
-    public static long getDayNumber(long date) {
-//        TimeZone tz= TimeZone.getDefault();
-//        long utcOffset = tz.getOffset(date);
-//        return (date + utcOffset) / DAY_IN_MILLIS;
-        return TimeUnit.MILLISECONDS.toDays(date);
-    }
-
-    /**
      *  Return milliseconds (UTC / GMT) for today's date at midnight in the local time zone
      *
      */
@@ -49,6 +39,16 @@ public final class DayUtils {
         long millisToUtc= TimeUnit.DAYS.toMillis(millisToDays);
 //        return retValNew;
         return millisToUtc;
+    }
+
+    /**
+     *  Return number of days since Jan 01, 1970, 12:00 Midnight UTC from passed date (current date)
+     */
+    public static long getDayNumber(long date) {
+//        TimeZone tz= TimeZone.getDefault();
+//        long utcOffset = tz.getOffset(date);
+//        return (date + utcOffset) / DAY_IN_MILLIS;
+        return TimeUnit.MILLISECONDS.toDays(date);
     }
 
     /**

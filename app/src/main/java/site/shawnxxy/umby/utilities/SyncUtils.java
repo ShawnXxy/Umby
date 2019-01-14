@@ -50,7 +50,7 @@ public class SyncUtils {
                 .setRecurring(true)
                 .setTrigger(Trigger.executionWindow(
                         SYNC_INTERVAL_SEC,
-                        SYNC_INTERVAL_HOURS + SYNC_FLEXTIME_SEC
+                        SYNC_INTERVAL_SEC + SYNC_FLEXTIME_SEC
                 ))
                 .setReplaceCurrent(true)
                 .build();
@@ -97,6 +97,8 @@ public class SyncUtils {
                 cursor.close();
             }
         });
+
+        checkForEmpty.start();
 //        new AsyncTask<Void, Void, Void>() {
 //            @Override
 //            public Void doInBackground(Void... voids) {
